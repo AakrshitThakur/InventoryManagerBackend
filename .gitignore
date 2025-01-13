@@ -1,0 +1,2 @@
+# preventing .env file from being committed to version control (like Git)
+.env
