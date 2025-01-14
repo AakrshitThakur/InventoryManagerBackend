@@ -13,7 +13,10 @@ require("dotenv").config();
 
 const app = express();
 const CorsOption = {
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://unrivaled-mooncake-39d61f.netlify.app",
+  ],
   credentials: true, // Allow cookies
 };
 
@@ -24,7 +27,9 @@ const ShopsRouter = require("./routers/shops.js");
 const CategoriesRouter = require("./routers/categories.js");
 const GraphAnalysesRouter = require("./routers/GraphAnalyses.js");
 
-const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(process.env.AakrshitThakurUSER_PSD)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
+const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(
+  process.env.AakrshitThakurUSER_PSD
+)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
 // Connecting DB
 mongoose
   .connect(MONGODB_URI)
@@ -34,7 +39,6 @@ mongoose
   .catch((error) => {
     console.error("OOPS! DB CONNECTION NOT ESTABLISHED", error);
   });
-
 
 // Using connect-mongodb-session to store session data in MongoDB.
 const store = new MongoDBStore({
