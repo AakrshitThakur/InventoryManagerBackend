@@ -15,7 +15,7 @@ const app = express();
 const CorsOption = {
   origin: [
     "http://localhost:5173",
-    "https://unrivaled-mooncake-39d61f.netlify.app",
+    "https://inventorymanager2025.netlify.app",
   ],
   credentials: true, // Allow cookies
 };
