@@ -24,9 +24,10 @@ const ShopsRouter = require("./routers/shops.js");
 const CategoriesRouter = require("./routers/categories.js");
 const GraphAnalysesRouter = require("./routers/GraphAnalyses.js");
 
-// Connecting DB(RentManager)'
+const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(process.env.AakrshitThakurUSER_PSD)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
+// Connecting DB
 mongoose
-  .connect("mongodb://localhost:27017/InventoryManager")
+  .connect(MONGODB_URI)
   .then(() => {
     console.log("DB SUCCESSFULLY CONNECTED");
   })
@@ -34,14 +35,15 @@ mongoose
     console.error("OOPS! DB CONNECTION NOT ESTABLISHED", error);
   });
 
+
 // Using connect-mongodb-session to store session data in MongoDB.
 const store = new MongoDBStore({
-  uri: "mongodb://localhost:27017/InventoryManager",
+  uri: MONGODB_URI,
   collection: "sessions",
 });
 
 store.on("error", (error) => {
-  console.log("Session store error:", error);
+  console.error("Session store error:", error);
 });
 
 // Third party middlewares

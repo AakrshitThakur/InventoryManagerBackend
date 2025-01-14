@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const ShopkeepersClass = require("../models/Shopkeeper.js");
 
+const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(process.env.AakrshitThakurUSER_PSD)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
+
 mongoose
-  .connect("mongodb://localhost:27017/InventoryManager")
+  .connect(MONGODB_URI)
   .then(() => {
     console.log("DB SUCCESSFULLY CONNECTED");
   })
@@ -21,13 +23,6 @@ ShopkeepersClass.deleteMany({})
     console.log(
       "DATA SUCCESSFULLY DELETED FROM shopkeepers collection of DB(InventoryManager)"
     );
-    // ShopkeepersClass.create(DemoShopkeepersData)
-    //     .then(() => {
-    //         console.log('DATA SUCCESSFULLY INSERTED INTO shopkeepers collection of DB(RentManger)');
-    //     })
-    //     .catch((error) => {
-    //         console.log('OOPS! CANNOT INSERT YOUR DEMO DATA', error);
-    //     });
   })
   .catch((error) => {
     console.log("OOPS! CANNOT DELETE prev documents", error);

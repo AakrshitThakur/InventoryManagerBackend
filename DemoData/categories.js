@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 const CategoryClass = require("../models/Category.js");
 
+const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(process.env.AakrshitThakurUSER_PSD)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
+
 // Connecting DB(InventoryManager)'
 mongoose
-  .connect("mongodb://localhost:27017/InventoryManager")
+  .connect(MONGODB_URI)
   .then(() => {
     console.log("DB SUCCESSFULLY CONNECTED");
     const RemoveEverything = async () => {
