@@ -54,16 +54,17 @@ store.on("error", (error) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(CorsOption));
+app.set('trust proxy', 1); // Trust the first proxy
 // Configure session middleware
 app.use(
   session({
-    secret: "mysecretkey", // Replace with a secure key
+    secret: process.env.SESSION_SECRET, // Replace with a secure key
     resave: false, // Prevents the session from being saved back to the session store on every request, even if it wasn't modified
     saveUninitialized: false, // Helps avoid creating empty sessions for unauthenticated users, conserving resources
     store: store, // address of DB where all the session data will be stored
     cookie: {
       // connect.sid serves as a reference to the session data stored on the server
-      secure: false, // Determines if the cookie is sent only over HTTPS.
+      secure: true, // Determines if the cookie is sent only over HTTPS.
       maxAge: 1000 * 60 * 60 * 24, // Store session cookie for 24 hour on client side i.e. browser
     },
   })
