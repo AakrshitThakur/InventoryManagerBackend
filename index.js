@@ -12,11 +12,11 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+
+app.set("trust proxy", 1); // Trust the first proxy
+
 const CorsOption = {
-  origin: [
-    "http://localhost:5173",
-    "https://inventorymanager2025.netlify.app",
-  ],
+  origin: ["http://localhost:5173", "https://inventorymanager2025.netlify.app"],
   credentials: true, // Allow cookies
 };
 
@@ -54,7 +54,6 @@ store.on("error", (error) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(CorsOption));
-app.set('trust proxy', 1); // Trust the first proxy
 // Configure session middleware
 app.use(
   session({
@@ -65,6 +64,7 @@ app.use(
     cookie: {
       // connect.sid serves as a reference to the session data stored on the server
       secure: true, // Determines if the cookie is sent only over HTTPS.
+      sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24, // Store session cookie for 24 hour on client side i.e. browser
     },
   })
