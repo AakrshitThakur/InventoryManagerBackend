@@ -64,6 +64,7 @@ app.use(
     cookie: {
       // connect.sid serves as a reference to the session data stored on the server
       secure: true, // Determines if the cookie is sent only over HTTPS.
+      path: "/", // Ensure the cookie is set for the entire domain
       sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24, // Store session cookie for 24 hour on client side i.e. browser
     },
