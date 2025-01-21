@@ -40,8 +40,8 @@ Enter your Cloudinary API secret
 ## Routes 
 
 | Shop routes                  | Method | Authentication | Authorization | Description                                      |
-|------------------------|--------|----------------|---------------|--------------------------------------------------|
-| `/shops/`               | GET    | No             | No            | Retrieves a list of all available shops.         |
+|------------------------------|-----|-----|-----|---------------------------------------------------------------------|
+| `/shops/`| GET    | No             | No            | Retrieves a list of all available shops.         |
 | `/shops/ViewMyShops`    | GET    | Yes            | No            | Retrieves all shops associated with the user.    |
 | `/shops/:id`            | GET    | Yes            | Yes           | Retrieves details of a specific shop by ID.      |
 | `/shops/create`         | POST   | Yes            | No            | Allows users to create a new shop.               |
