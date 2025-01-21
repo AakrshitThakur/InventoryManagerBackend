@@ -1,5 +1,5 @@
 
-# Inventory Manager Frontend
+# Inventory Manager Backend
 
 ![Inventor Manager logo](https://github.com/AakrshitThakur/InventoryManagerFrontend/blob/main/public/images/InventoryManagerDeployedImgs/InventorManagerLogo.png?raw=true)
 
@@ -19,47 +19,64 @@ Inventory Manager is a MERN stack-based website that helps users manage inventor
 
 
 
-## Colors Used
+## Environment Variables
 
-| Color Name | rgb() |
-|----------------|----------------|
-| Prussian blue color  | rgb(1, 51, 87) |
-| Tangerine color  | rgb(244, 147, 13)  |
-| Green color  | rgb(74, 222, 128)  |
-| Red color | rgb(248, 133, 133)  |
+To run this project, you will need to add the following environment variables to your .env file
 
+`CLOUDINARY_CLOUD_NAME` Enter your Cloudinary cloud name
 
-## Dark/Light Mode Toggle
+`CLOUDINARY_API_KEY`
+Enter your Cloudinary API key
 
-```javascript
-export const CheckDarkMode = (SetIsDarkModeActive) => {
-  const observer = new MutationObserver(() => {
-    SetIsDarkModeActive(document.documentElement.classList.contains('dark'));
-  });
+`CLOUDINARY_API_SECRET`
+Enter your Cloudinary API secret
 
-  // Observe changes to the `class` attribute of the <html> element
-  observer.observe(document.documentElement, { attributes: true });
+`AakrshitThakurUSER_PSD` Enter your MongoDB Atlas user password
 
-  // Return the observer instance so it can be cleaned up when needed
-  return observer;
-};
-```
+`PORT` Enter the port where the server will be hosted.
+
+`SESSION_SECRET` Enter your session secret
+
+## Routes 
+
+| Shop routes                  | Method | Authentication | Authorization | Description                                      |
+|------------------------|--------|----------------|---------------|--------------------------------------------------|
+| `/shops/`               | GET    | No             | No            | Retrieves a list of all available shops.         |
+| `/shops/ViewMyShops`    | GET    | Yes            | No            | Retrieves all shops associated with the user.    |
+| `/shops/:id`            | GET    | Yes            | Yes           | Retrieves details of a specific shop by ID.      |
+| `/shops/create`         | POST   | Yes            | No            | Allows users to create a new shop.               |
+| `/shops/:id/edit`       | POST   | Yes            | Yes           | Updates shop details by ID.                      |
+| `/shops/:id/delete`     | POST   | Yes            | Yes           | Deletes a shop by ID and updates the user's list.|
+
+| Category routes                                                 | Method | Authentication | Authorization | Description                                       |
+|-------------------------------------------------------|--------|----------------|---------------|---------------------------------------------------|
+| `/shops/:id/stockroom/categories`                      | GET    | Yes            | Yes           | Retrieves all categories for a specific shop.    |
+| `/shops/:id/stockroom/categories/new`                  | POST   | Yes            | Yes           | Creates a new category under a specific shop.    |
+| `/shops/:id/stockroom/categories/:CategoryID`          | GET    | Yes            | Yes           | Retrieves a specific category by its ID.         |
+| `/shops/:id/stockroom/categories/:CategoryID/new`      | POST   | Yes            | Yes           | Adds a new item under a specific category.       |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit` | POST   | Yes            | Yes           | Edits an item under a specific category.         |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | POST   | Yes            | Yes           | Deletes an item from a category.                 |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID`  | GET    | Yes            | Yes           | Retrieves item details from a specific category. |
+
+| GraphAnalyses routes                                                        | Method | Authentication | Authorization | Description                                                 |
+|--------------------------------------------------------------|--------|----------------|---------------|-------------------------------------------------------------|
+| `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses`   | GET    | Yes            | Yes           | Retrieves item data from a category for graphical analysis. |
 
 
 ## Run Locally
 
-**⚠️ Important:** Make sure to use port 5173 if you haven't already configured the CORS origin according to your needs.
+**⚠️ Important:** Make sure to configure the CORS origin according to your needs.
 
 Clone the project
 
 ```bash
-  git clone https://github.com/AakrshitThakur/InventoryManagerFrontend.git
+  git clone https://github.com/AakrshitThakur/InventoryManagerBackend.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd InventoryManagerFrontend
+  cd InventoryManagerBackend
 ```
 
 Install dependencies
@@ -68,15 +85,29 @@ Install dependencies
   npm install / npm i
 ```
 
-Start the server
+Start the server locally
 
 ```bash
-  npm run start
+  nodemon index.js / node index.js
 ```
+
+
+## Deployment
+
+To deploy this project run
+
+```bash
+  npm run deploy
+```
+
+
+## 🔗 Links
+
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/aakrshit-thakur-14433627b/)
+
 
 
 ## Feedback
 
 If you have any feedback, please reach out to us at thakurraakrshitt@gmail.com
-
 
