@@ -39,28 +39,30 @@ Enter your Cloudinary API secret
 
 ## Routes 
 
-| Shop routes                  | Method | Authentication | Authorization | Description                                      |
-|------------------------------|-----|-----|-----|---------------------------------------------------------------------|
-| `/shops/`| GET    | No             | No            | Retrieves a list of all available shops.         |
-| `/shops/ViewMyShops`    | GET    | Yes            | No            | Retrieves all shops associated with the user.    |
-| `/shops/:id`            | GET    | Yes            | Yes           | Retrieves details of a specific shop by ID.      |
-| `/shops/create`         | POST   | Yes            | No            | Allows users to create a new shop.               |
-| `/shops/:id/edit`       | POST   | Yes            | Yes           | Updates shop details by ID.                      |
-| `/shops/:id/delete`     | POST   | Yes            | Yes           | Deletes a shop by ID and updates the user's list.|
+| Shop routes                                       | Method | Authentication | Authorization | Description                                                                                  |
+|---------------------------------------------|--------|----------------|---------------|----------------------------------------------------------------------------------------------|
+| `/shops/`                                   | GET    | No             | No            | Retrieves a list of all available shops.                                                     |
+| `/shops/ViewMyShops`                         | GET    | Yes            | No            | Retrieves all shops associated with the currently authenticated user.                        |
+| `/shops/:id`                                 | GET    | Yes            | Yes           | Retrieves details of a specific shop by its ID.                                              |
+| `/shops/create`                              | POST   | Yes            | No            | Allows users to create a new shop with optional image upload.                                |
+| `/shops/:id/edit`                            | POST   | Yes            | Yes           | Updates shop details by ID, with an option to upload a new image or keep the existing one.   |
+| `/shops/:id/delete`                          | POST   | Yes            | Yes           | Deletes a shop by ID, removes associated categories, and updates the user's shop list.       |
 
-| Category routes                                                 | Method | Authentication | Authorization | Description                                       |
-|-------------------------------------------------------|--------|----------------|---------------|---------------------------------------------------|
-| `/shops/:id/stockroom/categories`                      | GET    | Yes            | Yes           | Retrieves all categories for a specific shop.    |
-| `/shops/:id/stockroom/categories/new`                  | POST   | Yes            | Yes           | Creates a new category under a specific shop.    |
-| `/shops/:id/stockroom/categories/:CategoryID`          | GET    | Yes            | Yes           | Retrieves a specific category by its ID.         |
-| `/shops/:id/stockroom/categories/:CategoryID/new`      | POST   | Yes            | Yes           | Adds a new item under a specific category.       |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit` | POST   | Yes            | Yes           | Edits an item under a specific category.         |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | POST   | Yes            | Yes           | Deletes an item from a category.                 |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID`  | GET    | Yes            | Yes           | Retrieves item details from a specific category. |
+| Category routes                                                       | Method | Authentication | Authorization | Description                                                                                  |
+|-------------------------------------------------------------|--------|----------------|---------------|----------------------------------------------------------------------------------------------|
+| `/shops/:id/stockroom/categories`                           | GET    | Yes            | Yes           | Retrieves all categories associated with a specific shop.                                    |
+| `/shops/:id/stockroom/categories/new`                       | POST   | Yes            | Yes           | Creates a new category under a specific shop.                                                |
+| `/shops/:id/stockroom/categories/:CategoryID`               | GET    | Yes            | Yes           | Retrieves details of a specific category under a shop.                                       |
+| `/shops/:id/stockroom/categories/:CategoryID/new`           | POST   | Yes            | Yes           | Adds a new item under a specific category.                                                   |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`  | POST   | Yes            | Yes           | Edits an existing item under a category, with an option to upload a new image.               |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete`| POST   | Yes            | Yes           | Deletes an item from a category and removes the associated image from cloud storage.         |
+| `/shops/:id/stockroom/categories/:CategoryID/:ItemID`       | GET    | Yes            | Yes           | Retrieves item details from a category.                                                      |
 
-| GraphAnalyses routes                                                        | Method | Authentication | Authorization | Description                                                 |
-|--------------------------------------------------------------|--------|----------------|---------------|-------------------------------------------------------------|
-| `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses`   | GET    | Yes            | Yes           | Retrieves item data from a category for graphical analysis. |
+
+| GraphAnalyses routes                                                      | Method | Authentication | Authorization | Description                                                                                                        |
+|------------------------------------------------------------|--------|----------------|---------------|--------------------------------------------------------------------------------------------------------------------|
+| `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | GET    | Yes            | Yes           | Retrieves item data from a category for graphical analysis, including prices, discounts, stock status, and payment details. |
+
 
 
 ## Run Locally
