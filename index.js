@@ -26,10 +26,16 @@ const ShopkeepersClass = require("./models/Shopkeeper.js");
 const ShopsRouter = require("./routers/shops.js");
 const CategoriesRouter = require("./routers/categories.js");
 const GraphAnalysesRouter = require("./routers/GraphAnalyses.js");
+const SendOTP = require("./utils/EmailService.js");
+const GenerateRandomOTP = require("./utils/GenerateRandomOTP.js");
 
-const MONGODB_URI = `mongodb+srv://AakrshitThakur:${encodeURIComponent(
-  process.env.AakrshitThakurUSER_PSD
-)}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`;
+const MONGODB_URI =
+  process.env.IS_PRODUCTION_ENV == "true"
+    ? `mongodb+srv://AakrshitThakur:${encodeURIComponent(
+        process.env.AakrshitThakurUSER_PSD
+      )}@cluster0.un7wj.mongodb.net/InventoryManager?retryWrites=true&w=majority&appName=Cluster0`
+    : "mongodb://localhost:27017/InventoryManager";
+
 // Connecting DB
 mongoose
   .connect(MONGODB_URI)
@@ -80,22 +86,110 @@ app.use("/shops", CategoriesRouter);
 app.post("/signup", async (req, res) => {
   console.log("Under /signup route");
   try {
-    const { username, psd } = req.body;
+    const username = req.body.username.trim();
+    const email = req.body.email.trim();
+    const psd = req.body.psd.trim();
 
     // Finding if user already exists or not
-    const UserAlreadyExists = await UserClass.findOne({ username: username });
+    const UserAlreadyExists = await UserClass.findOne({ email: email });
     if (UserAlreadyExists) {
-      return res.json({ username: "The username already exists" });
+      return res.json({ UserAlreadyExists: true });
     } else {
       // Now it is confirmed that the user does not already exist
-      const HashedPsd = await bcryptjs.hash(psd, 10);
-      const NewUser = new UserClass({ username, password: HashedPsd });
-      console.log(await NewUser.save());
+      // Generate 4-digit OTP
+      const OTP = GenerateRandomOTP();
+
+      // Storing OTP data in the session object to verify it later with the OTP entered by the user.
+      req.session.OTP = {
+        value: OTP, // Store OTP
+        ExpiresAt: Date.now() + 60 * 1000, // Expiry (1 minute)
+        attempts: 0, // Track OTP verification attempts
+      };
+      // Setting user in session obj to make new user after OTP verification
+      req.session.user = {
+        username: username,
+        email: email,
+        password: psd,
+      };
+
+      // Sending OTP to the recipient
+      SendOTP(email, OTP);
+
+      res.json({ ShowOTPBox: true });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.json({
+      GeneralError: {
+        msg: error.msg,
+        status: error.statusCode,
+      },
+    });
+  }
+});
+
+// User OTP verification
+app.post("/VerifyOTP", async (req, res) => {
+  console.log("Under /VerifyOTP route");
+  try {
+    const UserOTP = req.body.OTP.trim();
+
+    if (!req.session.OTP) {
+      return res.json({
+        ErrorMsg: { msg: "OTP expired or not found", status: "error" },
+      });
+    }
+
+    const { value, ExpiresAt, attempts } = req.session.OTP;
+
+    // Checking expiration
+    if (Date.now() > ExpiresAt) {
+      // Deleting unwanted sessions
+      delete req.session.OTP;
+      delete req.session.user;
+      return res.json({ ErrorMsg: { msg: "OTP expired", status: "error" } });
+    }
+
+    // Checking max attempts
+    if (attempts >= 3) {
+      // Deleting unwanted sessions
+      delete req.session.OTP;
+      delete req.session.user;
+      return res.json({
+        ErrorMsg: { msg: "Too many failed attempts", status: "error" },
+      });
+    }
+
+    // Comparing OTP (convert to string to prevent type mismatch)
+    if (UserOTP == value.toString()) {
+      // Clear OTP object after successful verification
+      delete req.session.OTP;
+
+      // Storing hashed password in the DB
+      const HashedPsd = await bcryptjs.hash(req.session.user.password, 10);
+      const NewUser = new UserClass({
+        username: req.session.user.username,
+        email: req.session.user.email,
+        password: HashedPsd,
+      });
+
+      // Modifying the user object (excluding the password property for security purposes)
       req.session.user = {
         id: NewUser._id,
-        username: username,
+        username: req.session.user.username,
+        email: req.session.user.email,
       };
-      res.json({ username: `${username}` });
+      console.log(await NewUser.save());
+      return res.json({
+        SuccessMsg: {
+          username: req.session.user.username,
+          status: "success",
+        },
+      });
+    } else {
+      // OTP entered by the user doesn't match
+      req.session.OTP.attempts += 1; // Increase failed attempt count
+      return res.json({ ErrorMsg: { msg: "Invalid OTP", status: "error" } });
     }
   } catch (error) {
     console.error(error.message);
@@ -112,30 +206,42 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     console.log("Under /login route");
-    const { username, psd } = req.body;
+
+    const email = req.body.email.trim();
+    const psd = req.body.psd.trim();
 
     // Finding if account is already made or not
-    const user = await UserClass.findOne({ username: username });
+    const user = await UserClass.findOne({ email: email });
     if (!user)
-      return res.json({ msg: "Incorrect credentials, please try again" });
+      return res.json({
+        ErrorMsg: {
+          msg: "Incorrect credentials, please try again",
+          status: "error",
+        },
+      });
     else {
       // Comparing password entered by the user with the password associated with username password
       const ComparePsd = await bcryptjs.compare(psd, user.password);
       if (!ComparePsd)
-        return res.json({ msg: "Incorrect credentials, please try again" });
+        return res.json({
+          ErrorMsg: {
+            msg: "Incorrect credentials, please try again",
+            status: "error",
+          },
+        });
       else {
-        // This method is used to regenerate a new session ID while preserving the session data.
-        req.session.regenerate((error) => {
-          if (error)
-            return res.json({ msg: "Incorrect credentials, please try again" });
-          // Setting current user data
-          req.session.user = {
-            id: user._id,
-            username: username,
-          };
-          return res.json({
-            msg: `Welcome back ${username}, you can click on the "Create Shop" button to create your own shop and manage your goods.`,
-          });
+        // Setting current user data
+        req.session.user = {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+        };
+        console.log(req.session);
+        return res.json({
+          SuccessMsg: {
+            msg: `Welcome back ${user.username}, you can click on the "Create Shop" button to create your own shop and manage your goods.`,
+            status: "success",
+          },
         });
       }
     }
