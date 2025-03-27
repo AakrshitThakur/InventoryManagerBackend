@@ -14,9 +14,23 @@ router.get("/", async (req, res) => {
   try {
     console.log("Under /shops route");
 
-    // Retrieving arrays of objects
-    const shops = await ShopkeepersClass.find();
-    res.json({ shops: shops });
+    const { SearchString, FilterBy } = req.query;
+    // Define a mapping for filter conditions
+    const FilterOptions = {
+      owner: { author: { $regex: SearchString, $options: "i" } },
+      ShopName: { ShopName: { $regex: SearchString, $options: "i" } },
+      address: { address: { $regex: SearchString, $options: "i" } },
+    };
+
+    // Get the appropriate filter condition based on FilterBy
+    const FilterCondition = FilterOptions[FilterBy];
+
+    // Check if a valid filter condition exists
+    if (FilterCondition) {
+      // Retrieve matched documents using dynamic filter
+      const shops = await ShopkeepersClass.find(FilterCondition);
+      res.json({ shops: shops });
+    } else throw new Error("Invalid filter criteria provided.");
   } catch (error) {
     console.error(error.message);
     res.json({
@@ -222,4 +236,3 @@ router.post(
 );
 
 module.exports = router;
-
