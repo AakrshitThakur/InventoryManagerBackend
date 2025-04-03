@@ -2,7 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const CheckAuthentication = require("../middlewares/CheckAuthentication.js");
-const CheckAuthorization = require("../middlewares/CheckAuthorization.js");
+const CheckAuthorizationForShops = require("../middlewares/CheckAuthorizationForShops.js");
+const GrantReadAccessForShops = require("../middlewares/GrantReadAccessForShops.js");
 const upload = require("../middlewares/multer.js");
 const ShopkeepersClass = require("../models/Shopkeeper.js");
 const UserClass = require("../models/User.js");
@@ -64,7 +65,7 @@ router.get("/ViewMyShops", CheckAuthentication, async (req, res) => {
 router.get(
   "/:id",
   CheckAuthentication,
-  CheckAuthorization,
+  GrantReadAccessForShops,
   async (req, res) => {
     try {
       console.log("Under /shops/:id route");
@@ -72,7 +73,7 @@ router.get(
 
       // Retrieving matched object from id
       const shop = await ShopkeepersClass.findById(id);
-      res.json({ shop });
+      res.json({ shop: shop, HasCRUDPermissions: req.HasCRUDPermissions });
     } catch (error) {
       console.error(error.message);
       res.json({
@@ -131,7 +132,7 @@ router.post(
 router.post(
   "/:id/edit",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   upload.single("ShopImg"),
   async (req, res) => {
     try {
@@ -155,7 +156,9 @@ router.post(
             new: true,
           })
         );
-        res.json({ ShopID: id });
+        res.json({
+          SuccessMsg: "Shop successfully edited",
+        });
       } else {
         const shop = await ShopkeepersClass.findById(id);
         // Delete the existing image using the publicId
@@ -176,7 +179,9 @@ router.post(
             new: true,
           })
         );
-        res.json({ ShopID: id });
+        res.json({
+          SuccessMsg: "Shop successfully edited",
+        });
       }
     } catch (error) {
       console.error(error.message);
@@ -194,7 +199,7 @@ router.post(
 router.post(
   "/:id/delete",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   async (req, res) => {
     try {
       console.log("Under /shops/:id/delete route");
@@ -211,7 +216,9 @@ router.post(
       const shop = await ShopkeepersClass.findById(id);
 
       // Delete the existing image
-      await cloudinary.uploader.destroy(shop.ShopFilename);
+      if (shop.ShopFilename) {
+        await cloudinary.uploader.destroy(shop.ShopFilename);
+      }
 
       // Removing all the categories one by one
       shop.categories.map(async (CategoryID) => {

@@ -26,6 +26,8 @@ const ShopkeepersClass = require("./models/Shopkeeper.js");
 const ShopsRouter = require("./routers/shops.js");
 const CategoriesRouter = require("./routers/categories.js");
 const GraphAnalysesRouter = require("./routers/GraphAnalyses.js");
+const CreateReqsRouter = require("./routers/CreateRequests.js");
+const ReqsRouter = require("./routers/requests.js");
 const SendOTP = require("./utils/EmailService.js");
 const GenerateRandomOTP = require("./utils/GenerateRandomOTP.js");
 
@@ -81,6 +83,8 @@ app.use(
 app.use("/shops", GraphAnalysesRouter);
 app.use("/shops", ShopsRouter);
 app.use("/shops", CategoriesRouter);
+app.use("/shops", CreateReqsRouter);
+app.use("", ReqsRouter);
 
 // User signup route
 app.post("/signup", async (req, res) => {

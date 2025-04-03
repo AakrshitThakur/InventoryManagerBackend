@@ -2,7 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const CheckAuthentication = require("../middlewares/CheckAuthentication.js");
-const CheckAuthorization = require("../middlewares/CheckAuthorization.js");
+const CheckAuthorizationForShops = require("../middlewares/CheckAuthorizationForShops.js");
+const GrantReadAccessForShops = require("../middlewares/GrantReadAccessForShops.js");
 const upload = require("../middlewares/multer.js");
 const cloudinary = require("../utils/cloudinary.js");
 const CategoryClass = require("../models/Category.js");
@@ -12,13 +13,16 @@ const ShopkeepersClass = require("../models/Shopkeeper.js");
 router.get(
   "/:id/stockroom/categories",
   CheckAuthentication,
-  CheckAuthorization,
+  GrantReadAccessForShops,
   async (req, res) => {
     console.log("Under /shops/:id/stockroom/categories route");
     try {
       const { id } = req.params;
       const shop = await ShopkeepersClass.findById(id).populate("categories");
-      res.json({ categories: shop.categories });
+      res.json({
+        categories: shop.categories,
+        HasCRUDPermissions: req.HasCRUDPermissions,
+      });
     } catch (error) {
       console.error(error.message);
       res.json({
@@ -35,7 +39,7 @@ router.get(
 router.post(
   "/:id/stockroom/categories/new",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   async (req, res) => {
     console.log("Under /shops/:id/stockroom/categories/new route");
     try {
@@ -71,13 +75,16 @@ router.post(
 router.get(
   "/:id/stockroom/categories/:CategoryID",
   CheckAuthentication,
-  CheckAuthorization,
+  GrantReadAccessForShops,
   async (req, res) => {
     console.log("Under /shops/:id/stockroom/categories/:CategoryID route");
     try {
       const { id, CategoryID } = req.params;
       const category = await CategoryClass.findById(CategoryID);
-      res.json({ CategoryObj: category });
+      res.json({
+        CategoryObj: category,
+        HasCRUDPermissions: req.HasCRUDPermissions,
+      });
     } catch (error) {
       console.error(error.message);
       res.json({
@@ -94,7 +101,7 @@ router.get(
 router.post(
   "/:id/stockroom/categories/:CategoryID/new",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   upload.single("ItemImg"),
   async (req, res) => {
     try {
@@ -134,7 +141,7 @@ router.post(
 router.post(
   "/:id/stockroom/categories/:CategoryID/:ItemID/edit",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   upload.single("ItemImg"),
   async (req, res) => {
     try {
@@ -161,7 +168,9 @@ router.post(
           { $set: { "items.$": ModifyItemData } },
           { new: true } // Use `$` to target the matched sub-document
         );
-        res.json({ ItemID: ItemID });
+        res.json({
+          SuccessMsg: "Item successfully edited",
+        });
       } else {
         // Delete the existing image using the publicId
         await cloudinary.uploader.destroy(req.body.PrevImgFilename);
@@ -184,7 +193,9 @@ router.post(
           { $set: { "items.$": ModifyItemData } },
           { new: true } // Use `$` to target the matched sub-document
         );
-        res.json({ ItemID: ItemID });
+        res.json({
+          SuccessMsg: "Item successfully edited",
+        });
       }
     } catch (error) {
       console.error(error.message);
@@ -202,7 +213,7 @@ router.post(
 router.post(
   "/:id/stockroom/categories/:CategoryID/:ItemID/delete",
   CheckAuthentication,
-  CheckAuthorization,
+  CheckAuthorizationForShops,
   async (req, res) => {
     try {
       const { id, CategoryID, ItemID } = req.params;
@@ -210,7 +221,9 @@ router.post(
       const item = await category.items.id(ItemID);
 
       // Delete the existing image
-      await cloudinary.uploader.destroy(item.ItemFilename);
+      if (item.ItemFilename) {
+        await cloudinary.uploader.destroy(item.ItemFilename);
+      }
 
       // Remove the sub-document by filtering it out
       category.items = category.items.filter(
@@ -218,10 +231,7 @@ router.post(
       );
       console.log(await category.save());
       res.json({
-        SuccessMsg: {
-          msg: "Item successfully deleted",
-          status: "success",
-        },
+        SuccessMsg: "Item successfully deleted",
       });
     } catch (error) {
       console.error(error.message);
@@ -239,18 +249,21 @@ router.post(
 router.get(
   "/:id/stockroom/categories/:CategoryID/:ItemID",
   CheckAuthentication,
-  CheckAuthorization,
+  GrantReadAccessForShops,
   async (req, res) => {
     try {
       console.log("Under /:id/stockroom/categories/:CategoryID/:ItemID");
       const { CategoryID, ItemID } = req.params;
 
-      // This will return parent document of matched sub-docuement
+      // This will return parent document of matched sub-document
       const category = await CategoryClass.findOne(
         { _id: CategoryID, "items._id": ItemID },
         { "items.$": 1 } // Project only the first matched sub-document
       );
-      res.json({ item: category.items[0] });
+      res.json({
+        item: category.items[0],
+        HasCRUDPermissions: req.HasCRUDPermissions,
+      });
     } catch (error) {
       console.error(error.message);
       res.json({

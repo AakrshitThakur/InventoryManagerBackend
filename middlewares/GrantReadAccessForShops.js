@@ -1,9 +1,9 @@
 // Authorization middleware
 const UserClass = require("../models/User.js");
 
-const CheckAuthorization = async (req, res, next) => {
+const GrantReadAccessForShops = async (req, res, next) => {
   try {
-    console.log("Under IsAuthorized middleware");
+    console.log("Under GrantReadAccessForShops middleware");
     const { id } = req.params;
 
     const UserID = req.session.user.id;
@@ -11,14 +11,13 @@ const CheckAuthorization = async (req, res, next) => {
 
     // Checking every shop ID in user.shops array
     for (let ShopID of user.shops) {
-      if (ShopID == id) return next();
+      if (ShopID == id) {
+        req.HasCRUDPermissions = true;
+        return next();
+      }
     }
-    res.json({
-      AuthorizationError: {
-        msg: "Sorry! You aren't allowed to view this resource.",
-        status: "error",
-      },
-    });
+    req.HasCRUDPermissions = false;
+    return next();
   } catch (error) {
     console.error(error.message);
     res.json({
@@ -30,4 +29,4 @@ const CheckAuthorization = async (req, res, next) => {
   }
 };
 
-module.exports = CheckAuthorization;
+module.exports = GrantReadAccessForShops;

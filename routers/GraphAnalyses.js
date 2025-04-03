@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const CheckAuthentication = require("../middlewares/CheckAuthentication.js");
-const CheckAuthorization = require("../middlewares/CheckAuthorization.js");
+const GrantReadAccessForShops = require("../middlewares/GrantReadAccessForShops.js");
 const ShopkeepersClass = require("../models/Shopkeeper.js");
 const UserClass = require("../models/User.js");
 const CategoryClass = require("../models/Category.js");
@@ -11,7 +11,7 @@ const CategoryClass = require("../models/Category.js");
 router.get(
   "/:id/stockroom/categories/:CategoryID/GraphAnalyses",
   CheckAuthentication,
-  CheckAuthorization,
+  GrantReadAccessForShops,
   async (req, res) => {
     try {
       console.log(
