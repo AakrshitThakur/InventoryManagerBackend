@@ -20,11 +20,9 @@ To run this project, you will need to add the following environment variables to
 
 `CLOUDINARY_CLOUD_NAME` Enter your Cloudinary cloud name
 
-`CLOUDINARY_API_KEY`
-Enter your Cloudinary API key
+`CLOUDINARY_API_KEY` Enter your Cloudinary API key
 
-`CLOUDINARY_API_SECRET`
-Enter your Cloudinary API secret
+`CLOUDINARY_API_SECRET` Enter your Cloudinary API secret
 
 `AakrshitThakurUSER_PSD` Enter your MongoDB Atlas user password
 
@@ -32,18 +30,26 @@ Enter your Cloudinary API secret
 
 `SESSION_SECRET` Enter your session secret
 
+`EMAIL_HOST` Enter your email hosting service
+
+`EMAIL_PORT` Enter your email hosting port
+
+`EMAIL_USER` Enter your email address
+
+`EMAIL_PASS` Enter your hashed email password
+
 ## Routes
 
 ### Shop Routes
 
-| Method | Endpoint             | Description                                                           | Auth Required | Middleware                                                    |
-| ------ | -------------------- | --------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
-| `GET`  | `/shops`             | Fetch all shops with optional filter (`owner`, `ShopName`, `address`) | ❌            | None                                                          |
-| `GET`  | `/shops/ViewMyShops` | Fetch all shops associated with the currently logged-in user          | ✅            | `CheckAuthentication`                                         |
-| `GET`  | `/shops/:id`         | Get a specific shop by ID                                             | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/create`      | Create a new shop (with optional image upload via `ShopImg`)          | ✅            | `CheckAuthentication`, `multer`                               |
-| `POST` | `/shops/:id/edit`    | Edit a specific shop by ID (with optional image update)               | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/delete`  | Delete a specific shop and associated categories + image cleanup      | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| Method | Endpoint             | Description                                                                | Auth Required | Middleware                                                    |
+| ------ | -------------------- | -------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
+| `GET`  | `/shops`             | Fetch all shops with optional filters (`owner`, `ShopName`, `address`)     | ❌ No         | None                                                          |
+| `GET`  | `/shops/ViewMyShops` | Fetch all shops associated with the currently logged-in user               | ✅ Yes        | `CheckAuthentication`                                         |
+| `GET`  | `/shops/:id`         | Get details of a specific shop by ID                                       | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| `POST` | `/shops/create`      | Create a new shop (supports image upload via `ShopImg` field)              | ✅ Yes        | `CheckAuthentication`, `multer` (for image handling)          |
+| `POST` | `/shops/:id/edit`    | Update a specific shop by ID (supports image update)                       | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
+| `POST` | `/shops/:id/delete`  | Delete a specific shop (including associated categories and image cleanup) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
 
 ### Category Routes
 
