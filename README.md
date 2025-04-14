@@ -53,15 +53,15 @@ To run this project, you will need to add the following environment variables to
 
 ### Category Routes
 
-| Method | Endpoint                                                     | Description                                                         | Auth Required | Middleware                                                    |
-| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
-| `GET`  | `/shops/:id/stockroom/categories`                            | Get all categories for a specific shop                              | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/:id/stockroom/categories/new`                        | Create a new category under a specific shop                         | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID`                | Get a specific category by ID                                       | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/new`            | Add a new item to a category (with optional image via `ItemImg`)    | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`   | Edit an item under a specific category (with optional image update) | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | Delete an item from a category (image is also removed from cloud)   | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/:ItemID`        | Get details of a specific item under a category                     | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| Method | Endpoint                                                     | Description                                                        | Auth Required | Middleware                                                    |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- |
+| `GET`  | `/shops/:id/stockroom/categories`                            | Fetch all categories for a specific shop                           | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| `POST` | `/shops/:id/stockroom/categories/new`                        | Create a new category under a specific shop                        | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID`                | Fetch details of a specific category by ID                         | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/new`            | Add a new item to a category (supports image upload via `ItemImg`) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`   | Edit an item under a category (supports image update)              | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | Delete an item from a category (including cloud image cleanup)     | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/:ItemID`        | Fetch details of a specific item under a category                  | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
 
 ### Graph Analysis Route
 
