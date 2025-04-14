@@ -1,6 +1,6 @@
 # Inventory Manager Backend
 
-![Inventor Manager logo](https://github.com/AakrshitThakur/InventoryManagerFrontend/blob/main/public/images/InventoryManagerDeployedImgs/InventorManagerLogo.png?raw=true)
+![Inventor Manager logo](https://github.com/AakrshitThakur/InventoryManagerFrontend/blob/main/public/images/Navbar.png)
 
 Inventory Manager is a MERN stack-based website that helps users manage inventory with CRUD operation.
 
