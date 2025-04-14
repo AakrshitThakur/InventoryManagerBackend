@@ -65,35 +65,35 @@ To run this project, you will need to add the following environment variables to
 
 ### Graph Analysis Route
 
-| Method | Endpoint                                                    | Description                                                     | Auth Required | Middleware                                       |
-| ------ | ----------------------------------------------------------- | --------------------------------------------------------------- | ------------- | ------------------------------------------------ |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | Extracts item-level data from a category for graphical analysis | ✅            | `CheckAuthentication`, `GrantReadAccessForShops` |
+| Method | Endpoint                                                    | Description                                                         | Auth Required | Middleware                                       |
+| ------ | ----------------------------------------------------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------ |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | Fetch item-level analytics data from a category (for charts/graphs) | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops` |
 
 ### Create Item Request Route
 
-| Method | Endpoint                                                       | Description                                                                 | Auth Required | Middleware            |
-| ------ | -------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------- | --------------------- |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Creates a new item request (e.g., procurement or order) for a specific item | ✅            | `CheckAuthentication` |
+| Method | Endpoint                                                       | Description                                                               | Auth Required | Middleware            |
+| ------ | -------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------- | --------------------- |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new item request (e.g., procurement, restock, or customer order) | ✅ Yes        | `CheckAuthentication` |
 
 ### Request Management Routes
 
-| Method | Endpoint                                                 | Description                                            | Auth Required | Middleware                                         |
-| ------ | -------------------------------------------------------- | ------------------------------------------------------ | ------------- | -------------------------------------------------- |
-| `GET`  | `/reqs/ViewReqsReceived`                                 | View all requests **received** by the logged-in user   | ✅            | `CheckAuthentication`                              |
-| `GET`  | `/reqs/ViewSentreqs`                                     | View all requests **sent** by the logged-in user       | ✅            | `CheckAuthentication`                              |
-| `GET`  | `/reqs/:id/accept`                                       | Accept a request if it is in `init` state              | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `GET`  | `/reqs/:id/reject`                                       | Reject a request if it is in `init` state              | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `POST` | `/reqs/:id/EditResponse`                                 | Add or edit a response message for a request in `init` | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `POST` | `/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new request for an item under a specific shop | ✅            | `CheckAuthentication`                              |
+| Method | Endpoint                                                       | Description                                                 | Auth Required | Middleware                                         |
+| ------ | -------------------------------------------------------------- | ----------------------------------------------------------- | ------------- | -------------------------------------------------- |
+| `GET`  | `/reqs/ViewReqsReceived`                                       | Fetch all requests **received** by the authenticated user   | ✅ Yes        | `CheckAuthentication`                              |
+| `GET`  | `/reqs/ViewSentReqs`                                           | Fetch all requests **sent** by the authenticated user       | ✅ Yes        | `CheckAuthentication`                              |
+| `GET`  | `/reqs/:id/accept`                                             | Accept a request (only if status is `init`)                 | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `GET`  | `/reqs/:id/reject`                                             | Reject a request (only if status is `init`)                 | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/reqs/:id/EditResponse`                                       | Add or update a response message (only if status is `init`) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new item request (e.g., restock, procurement)      | ✅ Yes        | `CheckAuthentication`                              |
 
 ### User Authentication Routes
 
-| Method | Endpoint     | Description                                    | Auth Required | Notes                                           |
-| ------ | ------------ | ---------------------------------------------- | ------------- | ----------------------------------------------- |
-| `POST` | `/signup`    | Start signup process — sends OTP to user email | ❌            | Stores OTP and user info temporarily in session |
-| `POST` | `/VerifyOTP` | Verify OTP and complete signup                 | ❌            | Max 3 attempts; OTP expires in 1 minute         |
-| `POST` | `/login`     | Login an existing user and store session       | ❌            | Compares hashed password                        |
-| `POST` | `/logout`    | Logout the current user and destroy session    | ✅            | Clears session and cookie                       |
+| Method | Endpoint      | Description                                       | Auth Required | Notes                                                                       |
+| ------ | ------------- | ------------------------------------------------- | ------------- | --------------------------------------------------------------------------- |
+| `POST` | `/signup`     | Initiate user signup process (sends OTP to email) | ❌ No         | - Stores OTP and user data in temporary session<br>- OTP valid for 1 minute |
+| `POST` | `/verify-otp` | Validate OTP to complete registration             | ❌ No         | - Maximum 3 attempts allowed<br>- Expires after 1 minute                    |
+| `POST` | `/login`      | Authenticate existing user (creates session)      | ❌ No         | - Uses secure password hashing<br>- Sets HTTP-only session cookie           |
+| `POST` | `/logout`     | Terminate current user session                    | ✅ Yes        | - Destroys server session<br>- Clears client-side cookies                   |
 
 ## Run Locally
 
