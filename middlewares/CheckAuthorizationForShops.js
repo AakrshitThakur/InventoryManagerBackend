@@ -9,7 +9,7 @@ const CheckAuthorizationForShops = async (req, res, next) => {
     // Extract shop ID from request parameters
     const { id } = req.params;
 
-    // Retrieve the logged-in user's ID from the session
+    // Retrieve the logged-in user's ID from the sessaion
     const UserID = req.session.user.id;
 
     // Fetch the user from the database using their ID
