@@ -34,7 +34,7 @@ Enter your Cloudinary API secret
 
 ## Routes
 
-## 🛍️ Shop Routes
+### Shop Routes
 
 | Method | Endpoint             | Description                                                           | Auth Required | Middleware                                                    |
 | ------ | -------------------- | --------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
@@ -45,19 +45,49 @@ Enter your Cloudinary API secret
 | `POST` | `/shops/:id/edit`    | Edit a specific shop by ID (with optional image update)               | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
 | `POST` | `/shops/:id/delete`  | Delete a specific shop and associated categories + image cleanup      | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
 
-| Category routes                                              | Method | Authentication | Authorization | Description                                                                          |
-| ------------------------------------------------------------ | ------ | -------------- | ------------- | ------------------------------------------------------------------------------------ |
-| `/shops/:id/stockroom/categories`                            | GET    | Yes            | Yes           | Retrieves all categories associated with a specific shop.                            |
-| `/shops/:id/stockroom/categories/new`                        | POST   | Yes            | Yes           | Creates a new category under a specific shop.                                        |
-| `/shops/:id/stockroom/categories/:CategoryID`                | GET    | Yes            | Yes           | Retrieves details of a specific category under a shop.                               |
-| `/shops/:id/stockroom/categories/:CategoryID/new`            | POST   | Yes            | Yes           | Adds a new item under a specific category.                                           |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`   | POST   | Yes            | Yes           | Edits an existing item under a category, with an option to upload a new image.       |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | POST   | Yes            | Yes           | Deletes an item from a category and removes the associated image from cloud storage. |
-| `/shops/:id/stockroom/categories/:CategoryID/:ItemID`        | GET    | Yes            | Yes           | Retrieves item details from a category.                                              |
+### Category Routes
 
-| GraphAnalyses routes                                        | Method | Authentication | Authorization | Description                                                                                                                 |
-| ----------------------------------------------------------- | ------ | -------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | GET    | Yes            | Yes           | Retrieves item data from a category for graphical analysis, including prices, discounts, stock status, and payment details. |
+| Method | Endpoint                                                     | Description                                                         | Auth Required | Middleware                                                    |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
+| `GET`  | `/shops/:id/stockroom/categories`                            | Get all categories for a specific shop                              | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| `POST` | `/shops/:id/stockroom/categories/new`                        | Create a new category under a specific shop                         | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID`                | Get a specific category by ID                                       | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/new`            | Add a new item to a category (with optional image via `ItemImg`)    | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`   | Edit an item under a specific category (with optional image update) | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | Delete an item from a category (image is also removed from cloud)   | ✅            | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/:ItemID`        | Get details of a specific item under a category                     | ✅            | `CheckAuthentication`, `GrantReadAccessForShops`              |
+
+### Graph Analysis Route
+
+| Method | Endpoint                                                    | Description                                                     | Auth Required | Middleware                                       |
+| ------ | ----------------------------------------------------------- | --------------------------------------------------------------- | ------------- | ------------------------------------------------ |
+| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | Extracts item-level data from a category for graphical analysis | ✅            | `CheckAuthentication`, `GrantReadAccessForShops` |
+
+### Create Item Request Route
+
+| Method | Endpoint                                                       | Description                                                                 | Auth Required | Middleware            |
+| ------ | -------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------- | --------------------- |
+| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Creates a new item request (e.g., procurement or order) for a specific item | ✅            | `CheckAuthentication` |
+
+### Request Management Routes
+
+| Method | Endpoint                                                 | Description                                            | Auth Required | Middleware                                         |
+| ------ | -------------------------------------------------------- | ------------------------------------------------------ | ------------- | -------------------------------------------------- |
+| `GET`  | `/reqs/ViewReqsReceived`                                 | View all requests **received** by the logged-in user   | ✅            | `CheckAuthentication`                              |
+| `GET`  | `/reqs/ViewSentreqs`                                     | View all requests **sent** by the logged-in user       | ✅            | `CheckAuthentication`                              |
+| `GET`  | `/reqs/:id/accept`                                       | Accept a request if it is in `init` state              | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `GET`  | `/reqs/:id/reject`                                       | Reject a request if it is in `init` state              | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/reqs/:id/EditResponse`                                 | Add or edit a response message for a request in `init` | ✅            | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new request for an item under a specific shop | ✅            | `CheckAuthentication`                              |
+
+### User Authentication Routes
+
+| Method | Endpoint     | Description                                    | Auth Required | Notes                                           |
+| ------ | ------------ | ---------------------------------------------- | ------------- | ----------------------------------------------- |
+| `POST` | `/signup`    | Start signup process — sends OTP to user email | ❌            | Stores OTP and user info temporarily in session |
+| `POST` | `/VerifyOTP` | Verify OTP and complete signup                 | ❌            | Max 3 attempts; OTP expires in 1 minute         |
+| `POST` | `/login`     | Login an existing user and store session       | ❌            | Compares hashed password                        |
+| `POST` | `/logout`    | Logout the current user and destroy session    | ✅            | Clears session and cookie                       |
 
 ## Run Locally
 
