@@ -29,7 +29,7 @@ Inventory Manager is a MERN stack-based website that helps users manage inventor
 ## Tech Stack
 
 | Layer         | Tech                             |
-|--------------|----------------------------------|
+| ------------- | -------------------------------- |
 | Backend       | Node.js, Express.js              |
 | Database      | MongoDB Atlas                    |
 | Media         | Cloudinary                       |
@@ -111,34 +111,54 @@ The application will run at: `http://localhost:5000`
 
 ### Shop Routes
 
-| Method | Endpoint | Description | Auth Required | Middleware |
-|--------|----------|-------------|----------------|------------|
-| GET    | /shops | Get all shops | No | - |
-| GET    | /shops/ViewMyShops | Get user-owned shops | Yes | CheckAuthentication |
-| GET    | /shops/:id | Get shop by ID | Yes | CheckAuthentication, GrantReadAccessForShops |
-| POST   | /shops/create | Create a new shop (image upload) | Yes | CheckAuthentication, multer |
-| POST   | /shops/:id/edit | Update a shop | Yes | CheckAuthentication, CheckAuthorizationForShops, multer |
-| POST   | /shops/:id/delete | Delete a shop | Yes | CheckAuthentication, CheckAuthorizationForShops |
+| Method | Endpoint           | Description                      | Auth Required | Middleware                                              |
+| ------ | ------------------ | -------------------------------- | ------------- | ------------------------------------------------------- |
+| GET    | /shops             | Get all shops                    | No            | -                                                       |
+| GET    | /shops/ViewMyShops | Get user-owned shops             | Yes           | CheckAuthentication                                     |
+| GET    | /shops/:id         | Get shop by ID                   | Yes           | CheckAuthentication, GrantReadAccessForShops            |
+| POST   | /shops/create      | Create a new shop (image upload) | Yes           | CheckAuthentication, multer                             |
+| POST   | /shops/:id/edit    | Update a shop                    | Yes           | CheckAuthentication, CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/delete  | Delete a shop                    | Yes           | CheckAuthentication, CheckAuthorizationForShops         |
 
 ### Category and Item Routes
 
-| Method | Endpoint | Description | Auth Required | Middleware |
-|--------|----------|-------------|----------------|------------|
-| GET    | /shops/:id/stockroom/categories | List categories | Yes | GrantReadAccessForShops |
-| POST   | /shops/:id/stockroom/categories/new | Create category | Yes | CheckAuthorizationForShops |
-| GET    | /shops/:id/stockroom/categories/:CategoryID | View category details | Yes | GrantReadAccessForShops |
-| POST   | /shops/:id/stockroom/categories/:CategoryID/new | Add item | Yes | CheckAuthorizationForShops, multer |
-| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/edit | Edit item | Yes | CheckAuthorizationForShops, multer |
-| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/delete | Delete item | Yes | CheckAuthorizationForShops |
-| GET    | /shops/:id/stockroom/categories/:CategoryID/:ItemID | View item | Yes | GrantReadAccessForShops |
+| Method | Endpoint                                                   | Description           | Auth Required | Middleware                         |
+| ------ | ---------------------------------------------------------- | --------------------- | ------------- | ---------------------------------- |
+| GET    | /shops/:id/stockroom/categories                            | List categories       | Yes           | GrantReadAccessForShops            |
+| POST   | /shops/:id/stockroom/categories/new                        | Create category       | Yes           | CheckAuthorizationForShops         |
+| GET    | /shops/:id/stockroom/categories/:CategoryID                | View category details | Yes           | GrantReadAccessForShops            |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/new            | Add item              | Yes           | CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/edit   | Edit item             | Yes           | CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/delete | Delete item           | Yes           | CheckAuthorizationForShops         |
+| GET    | /shops/:id/stockroom/categories/:CategoryID/:ItemID        | View item             | Yes           | GrantReadAccessForShops            |
 
 ### Graph Analysis
 
-| Method | Endpoint | Description | Auth Required | Middleware |
-|--------|----------|-------------|----------------|------------|
-| GET    | /shops/:id/stockroom/categories/:CategoryID/GraphAnalysis | Graph data for category | Yes | GrantReadAccessForShops |
+| Method | Endpoint                                                  | Description             | Auth Required | Middleware              |
+| ------ | --------------------------------------------------------- | ----------------------- | ------------- | ----------------------- |
+| GET    | /shops/:id/stockroom/categories/:CategoryID/GraphAnalysis | Graph data for category | Yes           | GrantReadAccessForShops |
 
 ---
+
+### Request Management Routes
+
+| Method | Endpoint                                                 | Description                    | Auth Required | Middleware                                         |
+| ------ | -------------------------------------------------------- | ------------------------------ | ------------- | -------------------------------------------------- |
+| `GET`  | `/reqs/ViewReqsReceived`                                 | View all requests received     | Yes           | `CheckAuthentication`                              |
+| `GET`  | `/reqs/ViewSentreqs`                                     | View all requests sent         | Yes           | `CheckAuthentication`                              |
+| `GET`  | `/reqs/:id/accept`                                       | Accept a request               | Yes           | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `GET`  | `/reqs/:id/reject`                                       | Reject a request               | Yes           | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/reqs/:id/EditResponse`                                 | Add or edit a response message | Yes           | `CheckAuthentication`, `CheckAuthorizationForReqs` |
+| `POST` | `/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new request           | Yes           | `CheckAuthentication`                              |
+
+### Authentication Routes
+
+| Method | Endpoint     | Description                                    | Auth Required | Notes                                           |
+| ------ | ------------ | ---------------------------------------------- | ------------- | ----------------------------------------------- |
+| `POST` | `/signup`    | Start signup process — sends OTP to user email | No            | Stores OTP and user info temporarily in session |
+| `POST` | `/VerifyOTP` | Verify OTP and complete signup                 | No            | Max 3 attempts; OTP expires in 1 minute         |
+| `POST` | `/login`     | Login an existing user and store session       | No            | Compares hashed password                        |
+| `POST` | `/logout`    | Logout the current user and destroy session    | Yes           | Clears session and cookie                       |
 
 ## Security Notes
 
@@ -169,6 +189,7 @@ Sample payloads and testing data are located in the `DemoData/` directory.
 
 **Author**: Aakrshit Thakur  
 GitHub: [@AakrshitThakur](https://github.com/AakrshitThakur)
+
 ## Feedback
 
 If you have any feedback, please reach out to us at thakurraakrshitt@gmail.com
