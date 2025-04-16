@@ -4,137 +4,171 @@
 
 Inventory Manager is a MERN stack-based website that helps users manage inventory with CRUD operation.
 
+## Features
+
+- User Authentication and Authorization  
+  Session-based login system with fine-grained access control for viewing and editing data.
+
+- Shop Management  
+  Create, read, update, and delete shops. Attach images via Cloudinary.
+
+- Category and Item Management  
+  Nested category structure per shop with items including images and metadata.
+
+- Cloudinary Integration  
+  Upload and manage images for shops and items.
+
+- Graph Analysis Support  
+  Backend-ready endpoints for analyzing stock quantities over time.
+
+- Email Support  
+  Send notifications and alerts using SMTP.
+
+---
+
 ## Tech Stack
 
-**Client:** React.js, Tailwind.css
+| Layer         | Tech                             |
+|--------------|----------------------------------|
+| Backend       | Node.js, Express.js              |
+| Database      | MongoDB Atlas                    |
+| Media         | Cloudinary                       |
+| Email Service | SMTP (Gmail, SendGrid supported) |
+| Security      | Express-Session, Dotenv          |
 
-**Server:** Node.js, Express.js
+---
 
-**Database:** MongoDB Atlas
+## Project Structure
 
-**Cloud:** Cloudinary to store user images
+```
+InventoryManagerBackend/
+├── DemoData/            # Sample JSON data
+├── middlewares/         # Authentication and Authorization
+├── models/              # Mongoose schemas
+├── routers/             # Route handlers (shops, auth, categories)
+├── utils/               # Utility functions (e.g., cloudinary, email)
+├── index.js             # Server entry point
+├── package.json         # Dependencies and scripts
+└── .env                 # Local environment variables
+```
 
-## Environment Variables
+---
 
-To run this project, you will need to add the following environment variables to your .env file
+## Installation
 
-`CLOUDINARY_CLOUD_NAME` Enter your Cloudinary cloud name
+### 1. Clone the repository
 
-`CLOUDINARY_API_KEY` Enter your Cloudinary API key
+```bash
+git clone https://github.com/AakrshitThakur/InventoryManagerBackend.git
+cd InventoryManagerBackend
+```
 
-`CLOUDINARY_API_SECRET` Enter your Cloudinary API secret
+### 2. Install dependencies
 
-`AakrshitThakurUSER_PSD` Enter your MongoDB Atlas user password
+```bash
+npm install
+```
 
-`PORT` Enter the port where the server will be hosted.
+### 3. Configure environment variables
 
-`SESSION_SECRET` Enter your session secret
+Create a `.env` file in the root directory and include the following:
 
-`EMAIL_HOST` Enter your email hosting service
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 
-`EMAIL_PORT` Enter your email hosting port
+AakrshitThakurUSER_PSD=your_mongodb_password
+PORT=5000
+SESSION_SECRET=your_session_secret
 
-`EMAIL_USER` Enter your email address
+EMAIL_HOST=smtp.emailprovider.com
+EMAIL_PORT=587
+EMAIL_USER=youremail@example.com
+EMAIL_PASS=your_email_password
+```
 
-`EMAIL_PASS` Enter your hashed email password
+### 4. Start the server
 
-## Routes
+```bash
+npm start
+```
+
+The application will run at: `http://localhost:5000`
+
+---
+
+## Authentication & Middleware
+
+- `CheckAuthentication`: Validates user session.
+- `CheckAuthorizationForShops`: Ensures the user owns the shop.
+- `GrantReadAccessForShops`: Allows shared access for viewing.
+- `multer`: Handles image uploads for shops and items.
+
+---
+
+## API Reference
 
 ### Shop Routes
 
-| Method | Endpoint             | Description                                                                | Auth Required | Middleware                                                    |
-| ------ | -------------------- | -------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
-| `GET`  | `/shops`             | Fetch all shops with optional filters (`owner`, `ShopName`, `address`)     | ❌ No         | None                                                          |
-| `GET`  | `/shops/ViewMyShops` | Fetch all shops associated with the currently logged-in user               | ✅ Yes        | `CheckAuthentication`                                         |
-| `GET`  | `/shops/:id`         | Get details of a specific shop by ID                                       | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/create`      | Create a new shop (supports image upload via `ShopImg` field)              | ✅ Yes        | `CheckAuthentication`, `multer` (for image handling)          |
-| `POST` | `/shops/:id/edit`    | Update a specific shop by ID (supports image update)                       | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/delete`  | Delete a specific shop (including associated categories and image cleanup) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
+| Method | Endpoint | Description | Auth Required | Middleware |
+|--------|----------|-------------|----------------|------------|
+| GET    | /shops | Get all shops | No | - |
+| GET    | /shops/ViewMyShops | Get user-owned shops | Yes | CheckAuthentication |
+| GET    | /shops/:id | Get shop by ID | Yes | CheckAuthentication, GrantReadAccessForShops |
+| POST   | /shops/create | Create a new shop (image upload) | Yes | CheckAuthentication, multer |
+| POST   | /shops/:id/edit | Update a shop | Yes | CheckAuthentication, CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/delete | Delete a shop | Yes | CheckAuthentication, CheckAuthorizationForShops |
 
-### Category Routes
+### Category and Item Routes
 
-| Method | Endpoint                                                     | Description                                                        | Auth Required | Middleware                                                    |
-| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- |
-| `GET`  | `/shops/:id/stockroom/categories`                            | Fetch all categories for a specific shop                           | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/:id/stockroom/categories/new`                        | Create a new category under a specific shop                        | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID`                | Fetch details of a specific category by ID                         | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/new`            | Add a new item to a category (supports image upload via `ItemImg`) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/edit`   | Edit an item under a category (supports image update)              | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`, `multer` |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/delete` | Delete an item from a category (including cloud image cleanup)     | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForShops`           |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/:ItemID`        | Fetch details of a specific item under a category                  | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops`              |
+| Method | Endpoint | Description | Auth Required | Middleware |
+|--------|----------|-------------|----------------|------------|
+| GET    | /shops/:id/stockroom/categories | List categories | Yes | GrantReadAccessForShops |
+| POST   | /shops/:id/stockroom/categories/new | Create category | Yes | CheckAuthorizationForShops |
+| GET    | /shops/:id/stockroom/categories/:CategoryID | View category details | Yes | GrantReadAccessForShops |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/new | Add item | Yes | CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/edit | Edit item | Yes | CheckAuthorizationForShops, multer |
+| POST   | /shops/:id/stockroom/categories/:CategoryID/:ItemID/delete | Delete item | Yes | CheckAuthorizationForShops |
+| GET    | /shops/:id/stockroom/categories/:CategoryID/:ItemID | View item | Yes | GrantReadAccessForShops |
 
-### Graph Analysis Route
+### Graph Analysis
 
-| Method | Endpoint                                                    | Description                                                         | Auth Required | Middleware                                       |
-| ------ | ----------------------------------------------------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------ |
-| `GET`  | `/shops/:id/stockroom/categories/:CategoryID/GraphAnalyses` | Fetch item-level analytics data from a category (for charts/graphs) | ✅ Yes        | `CheckAuthentication`, `GrantReadAccessForShops` |
+| Method | Endpoint | Description | Auth Required | Middleware |
+|--------|----------|-------------|----------------|------------|
+| GET    | /shops/:id/stockroom/categories/:CategoryID/GraphAnalysis | Graph data for category | Yes | GrantReadAccessForShops |
 
-### Create Item Request Route
+---
 
-| Method | Endpoint                                                       | Description                                                               | Auth Required | Middleware            |
-| ------ | -------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------- | --------------------- |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new item request (e.g., procurement, restock, or customer order) | ✅ Yes        | `CheckAuthentication` |
+## Security Notes
 
-### Request Management Routes
+- Uses express-session to manage user sessions.
+- All sensitive credentials are stored securely using dotenv.
+- Custom middleware is used for authentication and authorization.
+- Uploaded images are stored in Cloudinary and removed when no longer needed.
 
-| Method | Endpoint                                                       | Description                                                 | Auth Required | Middleware                                         |
-| ------ | -------------------------------------------------------------- | ----------------------------------------------------------- | ------------- | -------------------------------------------------- |
-| `GET`  | `/reqs/ViewReqsReceived`                                       | Fetch all requests **received** by the authenticated user   | ✅ Yes        | `CheckAuthentication`                              |
-| `GET`  | `/reqs/ViewSentReqs`                                           | Fetch all requests **sent** by the authenticated user       | ✅ Yes        | `CheckAuthentication`                              |
-| `GET`  | `/reqs/:id/accept`                                             | Accept a request (only if status is `init`)                 | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `GET`  | `/reqs/:id/reject`                                             | Reject a request (only if status is `init`)                 | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `POST` | `/reqs/:id/EditResponse`                                       | Add or update a response message (only if status is `init`) | ✅ Yes        | `CheckAuthentication`, `CheckAuthorizationForReqs` |
-| `POST` | `/shops/:id/stockroom/categories/:CategoryID/:ItemID/reqs/new` | Create a new item request (e.g., restock, procurement)      | ✅ Yes        | `CheckAuthentication`                              |
+---
 
-### User Authentication Routes
+## Sample Data
 
-| Method | Endpoint      | Description                                       | Auth Required | Notes                                                                       |
-| ------ | ------------- | ------------------------------------------------- | ------------- | --------------------------------------------------------------------------- |
-| `POST` | `/signup`     | Initiate user signup process (sends OTP to email) | ❌ No         | - Stores OTP and user data in temporary session<br>- OTP valid for 1 minute |
-| `POST` | `/verify-otp` | Validate OTP to complete registration             | ❌ No         | - Maximum 3 attempts allowed<br>- Expires after 1 minute                    |
-| `POST` | `/login`      | Authenticate existing user (creates session)      | ❌ No         | - Uses secure password hashing<br>- Sets HTTP-only session cookie           |
-| `POST` | `/logout`     | Terminate current user session                    | ✅ Yes        | - Destroys server session<br>- Clears client-side cookies                   |
+Sample payloads and testing data are located in the `DemoData/` directory.
 
-## Run Locally
+---
 
-**⚠️ Important:** Make sure to configure the CORS origin according to your needs.
+## Contributing
 
-Clone the project
+1. Fork this repository
+2. Create a new feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m "Add new feature"`)
+4. Push to GitHub (`git push origin feature/your-feature`)
+5. Create a pull request describing your changes
 
-```bash
-  git clone https://github.com/AakrshitThakur/InventoryManagerBackend.git
-```
+---
 
-Go to the project directory
+## Contact
 
-```bash
-  cd InventoryManagerBackend
-```
-
-Install dependencies
-
-```bash
-  npm install / npm i
-```
-
-Start the server locally
-
-```bash
-  nodemon index.js / node index.js
-```
-
-## Deployment
-
-To deploy this project run
-
-```bash
-  npm run deploy
-```
-
-## 🔗 Links
-
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/aakrshit-thakur-14433627b/)
-
+**Author**: Aakrshit Thakur  
+GitHub: [@AakrshitThakur](https://github.com/AakrshitThakur)
 ## Feedback
 
 If you have any feedback, please reach out to us at thakurraakrshitt@gmail.com
